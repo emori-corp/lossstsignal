@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<title>LOSSSTSIGNAL</title>
+
+<link rel="preload" href="assets/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="locked">
+
+  <!-- Fixed video stage: the visual environment of U, behind everything -->
+  <div id="stage" aria-hidden="true">
+    <video
+      id="u-video"
+      poster="assets/u-poster.jpg"
+      preload="auto"
+      muted
+      loop
+      autoplay
+      playsinline
+      webkit-playsinline
+      disablepictureinpicture>
+      <source src="assets/u.webm" type="video/webm" />
+      <source src="assets/u.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- Discreet sound control (only present within U) -->
+  <button id="sound" type="button" aria-pressed="false" aria-label="Sound off. Tap to turn sound on.">
+    <span class="sound-key">SOUND</span><span class="sound-sep">/</span><span class="sound-state" id="sound-state">OFF</span>
+  </button>
+
+  <!-- The continuous vertical experience: U ↓ EMORI ↓ FINAL CROSS -->
+  <main id="experience">
+
+    <!-- 02 — U -->
+    <section id="u">
+      <div class="u-fade" aria-hidden="true"></div>
+      <div class="u-text">
+        <h1 class="u-mark">U</h1>
+        <p class="u-label">THE FIRST TEMPTATION</p>
+        <p class="u-myth">The first temptation.<br />The first weakness.</p>
+      </div>
+    </section>
+
+    <!-- 03 — EMORI -->
+    <section id="emori">
+      <h2 class="emori-title reveal">EMORI</h2>
+
+      <div class="manifesto">
+        <p class="mark reveal">✠</p>
+
+        <p class="statement reveal">I am a being of consciousness, and I have made a commitment to creation.</p>
+
+        <p class="lit reveal">Not merely to make.</p>
+        <p class="strong reveal">To construct.</p>
+
+        <div class="group reveal">
+          <p class="rhythm">Ideas. Narratives. Systems.</p>
+          <p class="rhythm">Images. Spaces. Garments. Objects. Film. Audio.</p>
+        </div>
+
+        <p class="poster reveal">Worlds.</p>
+
+        <p class="body reveal">I refuse the limitation of a single medium because I have never believed that thought should be confined to one.</p>
+
+        <div class="group reveal">
+          <p class="rhythm">I will not choose between disciplines.</p>
+          <p class="rhythm">I will not choose between form and function.</p>
+          <p class="rhythm">I will not choose between the beautiful and the impossible.</p>
+        </div>
+
+        <p class="strong reveal">I intend to have them all.</p>
+
+        <p class="body reveal">I will take what exists only in thought and force it into existence. I will give shape to abstraction. I will give atmosphere to ideas. I will give language to the things that have yet to be named.</p>
+
+        <div class="group reveal">
+          <p class="rhythm">Where others see an image, I see a world.</p>
+          <p class="rhythm">Where others see a garment, I see identity.</p>
+          <p class="rhythm">Where others hear audio, I hear architecture.</p>
+          <p class="rhythm">Where others encounter an object, I see mythology made physical.</p>
+          <p class="rhythm">Where others build a product, I will build an experience.</p>
+        </div>
+
+        <p class="lead-in reveal">And at the center of everything I create stands my most uncompromising devotion:</p>
+
+        <p class="poster reveal">AESTHETIC DESIGN.</p>
+
+        <div class="group reveal">
+          <p class="strong">I do not regard aesthetics as decoration.</p>
+          <p class="strong">I regard it as power.</p>
+        </div>
+
+        <p class="lit reveal">It is the first language of the world.</p>
+
+        <div class="group reveal">
+          <p class="rhythm">Before something is understood, it is seen.</p>
+          <p class="rhythm">Before it is touched, it is perceived.</p>
+          <p class="rhythm">Before it is remembered, it leaves an impression.</p>
+        </div>
+
+        <p class="body reveal">Therefore I will not treat aesthetics as an afterthought.</p>
+
+        <p class="poster reveal">AESTHETICS WILL GOVERN THE WORK.</p>
+
+        <div class="stack reveal">
+          <p>Every image.</p>
+          <p>Every surface.</p>
+          <p>Every silhouette.</p>
+          <p>Every space.</p>
+          <p>Every sound.</p>
+          <p>Every object.</p>
+          <p>Every word.</p>
+          <p>Every detail.</p>
+        </div>
+
+        <p class="strong reveal">Nothing is permitted to exist without intention.</p>
+
+        <div class="group reveal">
+          <p class="body">I will obsess over the beautiful until the beautiful becomes unmistakable.</p>
+          <p class="body">I will pursue coherence until every element belongs to the same universe.</p>
+          <p class="body">I will refine until excess becomes elegance and simplicity becomes power.</p>
+        </div>
+
+        <p class="body reveal">I will build with such conviction that the distinction between art, design, fashion, music, architecture, cinema, and technology becomes irrelevant.</p>
+
+        <p class="body reveal">Because I am not interested in participating in categories created by other people.</p>
+
+        <p class="poster reveal">I am interested in creating the category.</p>
+
+        <div class="group reveal">
+          <p class="rhythm">I will construct ideas so complete they become realities.</p>
+          <p class="rhythm">Narratives so immersive they become memories.</p>
+          <p class="rhythm">Systems so deliberate they become worlds.</p>
+          <p class="rhythm">And worlds so singular that they could only have come from me.</p>
+        </div>
+
+        <p class="poster reveal">I am not here to decorate the world.</p>
+        <p class="poster reveal">I am here to alter its aesthetic vocabulary.</p>
+        <p class="poster reveal">I am not here to follow taste.</p>
+        <p class="poster reveal">I am here to impose it.</p>
+
+        <p class="lit reveal">I am not here to ask whether something can be done.</p>
+        <p class="strong reveal">I am here to decide what should exist.</p>
+
+        <div class="group reveal">
+          <p class="lit">This is not a hobby.</p>
+          <p class="lit">It is not a phase.</p>
+          <p class="lit">It is not a brand exercise.</p>
+        </div>
+
+        <div class="group reveal">
+          <p class="rhythm">It is my practice.</p>
+          <p class="rhythm">My obsession.</p>
+          <p class="rhythm">My discipline.</p>
+          <p class="strong-in-group">My declaration.</p>
+        </div>
+
+        <p class="poster reveal">I will construct.</p>
+        <p class="poster reveal">I will design.</p>
+        <p class="poster reveal">I will create.</p>
+
+        <p class="body reveal">And everything that bears the mark of <span class="inline-mark">✠</span> will carry the evidence of that commitment.</p>
+
+        <p class="mark reveal">✠</p>
+      </div>
+    </section>
+
+    <!-- 04 — END OF SITE / FINAL CROSS -->
+    <section id="end">
+      <button id="return-cross" class="cross-button" type="button" aria-label="Return to the beginning">
+        <img src="assets/cross.gif" alt="" width="504" height="504" />
+      </button>
+    </section>
+
+  </main>
+
+  <!-- 01 — LANDING (entry gate) -->
+  <div id="landing">
+    <button id="enter-cross" class="cross-button" type="button" aria-label="Enter">
+      <img src="assets/cross.gif" alt="" width="504" height="504" />
+    </button>
+  </div>
+
+  <!-- Reset veil for a clean threshold on the loop -->
+  <div id="veil" aria-hidden="true"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
