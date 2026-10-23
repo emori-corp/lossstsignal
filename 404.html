@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>LOSSSTSIGNAL</title>
+<meta name="description" content="LOSSSTSIGNAL — immersive portal for the EXODIA universe / ARCADIA. ✠">
+<meta property="og:title" content="LOSSSTSIGNAL">
+<meta property="og:description" content="✠">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{
+  --black:#000;
+  --bone:#E8E4DA;
+  --ash:#6E6E73;
+  --blade:#A9AEB4;
+  --blood-deep:#420109;
+  --blood-live:#C40D1E;
+  --meta:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Helvetica Neue",Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--black);color:var(--bone);font-family:var(--meta);overflow:hidden;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#app{position:fixed;inset:0}
+#void{position:fixed;inset:0;z-index:0;background:#050506;overflow:hidden;pointer-events:none}
+#void svg{position:absolute;inset:0;opacity:.85}
+#void::after{content:"";position:absolute;inset:0;background:radial-gradient(120vmax 90vmax at 50% 42%,transparent 40%,rgba(0,0,0,.72) 100%)}
+button{font-family:inherit}
+.view{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .55s ease;
+  z-index:10;pointer-events:none}
+.view.is-active{opacity:1;visibility:visible;pointer-events:auto;z-index:20}
+
+/* ============ LANDING ============ */
+#landing{display:flex;align-items:center;justify-content:center;cursor:pointer}
+#crossHost{width:min(46vmin,360px);height:min(46vmin,360px);position:relative;
+  --g:0.15;filter:drop-shadow(0 0 calc(4px + var(--g)*40px) rgba(196,13,30,var(--g)))}
+#crossHost canvas,#crossHost img{width:100%;height:100%;display:block;
+  image-rendering:pixelated;image-rendering:crisp-edges}
+#crossHost img{object-fit:contain}
+
+/* ============ persistent ✠ anchor ============ */
+.anchor{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:40;
+  background:none;border:0;cursor:pointer;color:var(--bone);font-size:20px;line-height:1;
+  padding:15px 20px;opacity:.7;transition:opacity .25s,color .25s,transform .25s}
+.anchor:hover{opacity:1;color:var(--blood-live);transform:translateX(-50%) scale(1.14)}
+.anchor:focus-visible{outline:1px solid var(--blade);outline-offset:4px;opacity:1}
+#saClock{position:fixed;bottom:16px;right:20px;z-index:40;font-family:var(--meta);font-size:10px;letter-spacing:.22em;color:var(--blade);text-transform:uppercase;opacity:.7;user-select:none;display:none;text-align:right}
+#hubCredit{position:fixed;bottom:16px;left:20px;z-index:40;font-family:var(--meta);font-size:10px;letter-spacing:.22em;color:var(--blade);text-transform:uppercase;opacity:.6;user-select:none;display:none}
+
+/* ============ HUB ============ */
+#hub{display:flex;align-items:center;justify-content:center}
+.gates{display:grid;grid-template-columns:repeat(3,auto);grid-template-rows:repeat(3,auto);
+  gap:clamp(14px,3.4vw,46px);justify-content:center;align-items:center;justify-items:center}
+.gate.pos-top{grid-column:2;grid-row:1}
+.gate.pos-left{grid-column:1;grid-row:2}
+.gate.pos-center{grid-column:2;grid-row:2}
+.gate.pos-right{grid-column:3;grid-row:2}
+.gate.pos-bottom{grid-column:2;grid-row:3}
+.gate{background:none;border:0;cursor:pointer;padding:8px;display:flex;flex-direction:column;
+  align-items:center;gap:20px;opacity:0;transform:translateY(16px);animation:rise .7s forwards}
+.gate:nth-child(1){animation-delay:.05s}.gate:nth-child(2){animation-delay:.14s}
+.gate:nth-child(3){animation-delay:.23s}.gate:nth-child(4){animation-delay:.32s}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+.sym{--p:0;width:clamp(64px,9.5vw,100px);height:clamp(64px,9.5vw,100px);position:relative;
+  display:flex;align-items:center;justify-content:center;
+  transform:scale(calc(1 + var(--p)*.13));
+  filter:drop-shadow(0 6px calc(6px + var(--p)*26px) rgba(196,13,30,calc(var(--p)*.5)));
+  transition:transform .12s linear,filter .12s linear}
+.sym img{width:100%;height:100%;display:block}
+.gate[data-key="underbelly"] .sym::before{content:"";position:absolute;inset:-12%;z-index:-1;
+  background:radial-gradient(circle,rgba(196,13,30,calc(.12 + var(--p)*.4)),transparent 66%)}
+.mm-mark{display:flex;align-items:center;justify-content:center}
+.mm-mark img{width:100%;height:100%;object-fit:contain}
+.label{font-size:10px;letter-spacing:.26em;color:var(--ash);text-transform:uppercase;
+  text-align:center;white-space:nowrap;transition:color .25s,letter-spacing .25s}
+.label .lock{color:var(--blade);opacity:.55}
+.gate:hover .label,.gate:focus-visible .label{color:var(--bone);letter-spacing:.32em}
+.gate:focus-visible{outline:1px solid var(--blade);outline-offset:8px}
+
+/* ============ ACCESS DENIED popup ============ */
+#denied{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.82);opacity:0;visibility:hidden;transition:opacity .3s}
+#denied.show{opacity:1;visibility:visible}
+.denied-box{text-align:center;padding:40px;max-width:440px}
+.denied-box h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(38px,9vw,68px);color:var(--blood-live);
+  letter-spacing:.04em;line-height:.9}
+.denied-box p{margin-top:20px;font-size:12px;letter-spacing:.16em;color:var(--blade);
+  text-transform:uppercase;line-height:1.9}
+.denied-box .dismiss{margin-top:28px;font-size:10px;letter-spacing:.3em;color:var(--ash)}
+
+/* ============ LVNE — artist page + record view ============ */
+#lvne{overflow-y:auto}
+.lvne-screen{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .4s;overflow-y:auto}
+.lvne-screen.is-active{opacity:1;visibility:visible}
+#lvne .anchor{z-index:41}
+
+/* ---- transmission stage: the release's full-screen looping visual (record view) ---- */
+.stage{position:fixed;inset:0;z-index:0;background:#000;overflow:hidden;pointer-events:none}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.stage::after{content:"";position:absolute;inset:0;background:radial-gradient(120vmax 90vmax at 50% 45%,transparent 45%,rgba(0,0,0,.55) 100%)}
+#lvne.locked .stage{display:none}
+
+/* ---- artist page ---- */
+#artist .hero{position:relative;height:64vh;min-height:400px;overflow:hidden;
+  display:flex;align-items:flex-end;justify-content:flex-start}
+#artist .hero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.hero-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,transparent 34%,transparent 52%,rgba(0,0,0,.96) 100%)}
+.hero-id{position:relative;z-index:2;padding:0 0 32px clamp(22px,5vw,44px)}
+.hero-name{font-family:var(--display);font-weight:800;font-size:clamp(50px,12vw,120px);line-height:.86;
+  letter-spacing:-.01em;text-transform:uppercase;color:var(--bone);text-shadow:0 6px 46px rgba(0,0,0,.6)}
+
+.catalogue{max-width:960px;margin:0 auto;padding:clamp(48px,8vh,88px) clamp(20px,5vw,40px) 60px}
+.sec-label{font-family:var(--meta);font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--blade);margin:0 0 22px}
+.sec-tx{margin-top:44px}
+
+.latest{width:100%;background:none;border:0;padding:0;display:flex;gap:clamp(20px,4vw,40px);
+  align-items:center;cursor:pointer;text-align:left;color:inherit;font-family:inherit}
+.lat-cover{width:clamp(150px,32vw,300px);aspect-ratio:1;border-radius:12px;object-fit:cover;
+  border:1px solid rgba(169,174,180,.16);box-shadow:0 24px 60px rgba(0,0,0,.55);transition:transform .3s}
+.latest:hover .lat-cover{transform:translateY(-4px)}
+.lat-info{flex:1;min-width:0}
+.lat-title{font-family:var(--display);font-weight:800;font-size:clamp(52px,11vw,104px);line-height:.86;
+  text-transform:uppercase;margin:0 0 10px}
+.lat-sub{font-family:var(--meta);font-size:12px;letter-spacing:.22em;color:var(--ash);text-transform:uppercase}
+.lat-enter{margin-top:20px;display:inline-flex;align-items:center;gap:12px;font-family:var(--meta);
+  font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--bone)}
+
+.tx-list{display:flex;flex-direction:column}
+.tx-row{width:100%;background:none;border:0;border-top:1px solid rgba(169,174,180,.12);cursor:pointer;
+  display:flex;align-items:center;gap:16px;padding:14px 6px;transition:background .2s;text-align:left;
+  color:inherit;font-family:inherit}
+.tx-row:last-child{border-bottom:1px solid rgba(169,174,180,.12)}
+.tx-row:hover{background:rgba(255,255,255,.03)}
+.tx-num{font-family:var(--meta);font-size:12px;letter-spacing:.2em;color:var(--blade);width:40px;flex:none}
+.tx-thumb{width:52px;height:52px;border-radius:7px;object-fit:cover;flex:none;border:1px solid rgba(169,174,180,.14)}
+.tx-title{flex:1;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.04em;text-transform:uppercase}
+.tx-arrow{font-family:var(--meta);font-size:12px;color:var(--ash);opacity:0;transition:opacity .2s}
+.tx-row:hover .tx-arrow{opacity:1}
+
+/* ---- record view ---- */
+/* countdown (locked only) — clicking reveals the date (hidden easter egg, no affordance) */
+.lvne-clock{position:fixed;top:16px;right:20px;z-index:30;text-align:right;display:none}
+#lvne.locked .lvne-clock{display:block}
+.lvne-clock .time{font-family:var(--display);font-weight:800;font-size:clamp(24px,4vw,40px);line-height:.9;color:var(--bone);letter-spacing:.02em}
+.lvne-clock.live .time{color:var(--blood-live)}
+.lvne-clock .udate{margin-top:8px;font-family:var(--meta);font-size:12px;letter-spacing:.3em;color:var(--blade);opacity:0;transition:opacity .5s;pointer-events:none}
+.lvne-clock .udate.show{opacity:1}
+
+/* mini bar — persists as the only player surface until projectM full view ships */
+.mini{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:15;width:min(560px,92vw);
+  background:rgba(14,14,16,.72);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(169,174,180,.16);border-radius:16px;padding:10px 12px;
+  display:flex;align-items:center;gap:12px;overflow:hidden}
+.mini .art{width:42px;height:42px;border-radius:8px;object-fit:cover;flex:none;background:#111}
+.mini .txt{flex:1;min-width:0}
+.mini .name{font-weight:700;font-size:15px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini .sub{font-size:11px;color:var(--ash);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.mini .ctrls{display:flex;align-items:center;gap:14px;flex:none;padding-right:4px}
+.mini .ctrls button{background:none;border:0;color:var(--bone);cursor:pointer;display:flex;padding:4px}
+.mini .prog{position:absolute;left:0;bottom:0;height:2px;background:var(--blood-live);width:0}
+#lvne.locked .mini .ctrls button{color:#4a4a4e;pointer-events:none}
+#lvne.locked .mini .name{color:#8a8a8e}
+
+/* CREDITS tab + slide-out panel */
+#uTab{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:31;background:none;border:0;cursor:pointer;
+  color:var(--blade);writing-mode:vertical-rl;text-orientation:mixed;font-size:11px;letter-spacing:.36em;
+  text-transform:uppercase;padding:20px 14px;transition:color .2s}
+#uTab:hover{color:var(--bone)}
+.panel{position:fixed;left:0;top:0;bottom:0;width:min(380px,88vw);z-index:34;background:rgba(6,6,8,.97);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-right:1px solid rgba(169,174,180,.18);
+  transform:translateX(-102%);transition:transform .4s cubic-bezier(.2,.8,.2,1);
+  padding:58px 28px 34px;display:flex;flex-direction:column;gap:30px;overflow-y:auto}
+.panel.open{transform:translateX(0)}
+#lvne.panel-open .anchor{opacity:0;pointer-events:none}
+.panel .close{position:absolute;top:16px;right:18px;background:none;border:0;color:var(--ash);font-size:12px;cursor:pointer;letter-spacing:.2em}
+.p-label{font-family:var(--meta);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--blade);margin-bottom:12px}
+.p-art{position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid rgba(169,174,180,.14)}
+.p-cover{width:100%;height:100%;object-fit:cover;display:block}
+.p-syn{margin-top:14px;font-size:13px;line-height:1.75;color:var(--bone)}
+.p-syn:empty{display:none}
+.p-credits .k{font-family:var(--meta);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ash);margin-top:10px}
+.p-credits .v{font-size:15px;color:var(--bone);margin-top:2px}
+#pLyrics .locked{font-family:var(--meta);letter-spacing:.28em;text-transform:uppercase;color:var(--blade);font-size:11px;border:1px solid rgba(169,174,180,.2);padding:12px;text-align:center}
+#pLyrics p{font-size:14px;line-height:1.9;color:var(--bone);white-space:pre-line;text-transform:uppercase}
+
+@media(max-width:640px){
+  .latest{flex-direction:column;align-items:flex-start}
+  .lat-cover{width:min(70vw,300px)}
+}
+
+/* Declaration overlay (opened by © EMORI INC) */
+.decl-overlay{position:fixed;inset:0;z-index:70;background:rgba(3,3,4,.97);overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .4s}
+.decl-overlay.show{opacity:1;visibility:visible}
+.decl-close{position:fixed;top:14px;right:20px;z-index:71;background:none;border:0;color:var(--ash);font-size:16px;cursor:pointer}
+
+/* ============ THE OFFICE ============ */
+#office{overflow-y:auto}
+.office-wrap{max-width:720px;margin:0 auto;padding:84px 26px 90px}
+.decl-mark{font-size:26px;text-align:center;color:var(--bone);margin-bottom:36px}
+.decl{font-size:14px;line-height:2.05;letter-spacing:.02em;color:var(--bone)}
+.decl p{margin:0 0 18px}
+.decl .big{font-family:var(--display);font-weight:800;font-size:clamp(22px,4vw,32px);letter-spacing:.02em;
+  line-height:1.15;color:var(--bone);text-transform:uppercase;margin:30px 0}
+.decl .red{color:var(--blood-live)}
+.decl .sign{margin-top:34px;font-size:20px;color:var(--bone)}
+.office-head{margin-bottom:8px}
+.oh-eyebrow{font-size:10px;letter-spacing:.4em;color:var(--blade);text-transform:uppercase}
+.oh-title{font-family:var(--display);font-weight:800;font-size:clamp(46px,10vw,92px);text-transform:uppercase;line-height:.9;margin-top:12px}
+.wta-head{text-align:center;margin-bottom:34px}
+.wta-title{font-family:var(--display);font-weight:800;font-size:clamp(40px,8vw,84px);text-transform:uppercase;line-height:.9;letter-spacing:.01em}
+.wta-sub{margin-top:14px;font-size:11px;letter-spacing:.24em;color:var(--blade);text-transform:uppercase}
+.wta-form{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.wta-row{display:flex;gap:18px}
+.wta-field{display:flex;flex-direction:column;gap:8px}
+.wta-row .wta-field{flex:1}
+.wta-field>span{font-size:9px;letter-spacing:.3em;color:var(--ash);text-transform:uppercase}
+.wta-field input,.wta-field textarea{background:rgba(8,8,10,.55);border:1px solid rgba(169,174,180,.28);
+  color:var(--bone);font-family:var(--meta);font-size:13px;letter-spacing:.04em;padding:13px 14px;outline:none;
+  transition:border-color .2s,box-shadow .2s;resize:vertical;width:100%}
+.wta-field input::placeholder,.wta-field textarea::placeholder{color:#55555a}
+.wta-field input:focus,.wta-field textarea:focus{border-color:var(--blood-live);
+  box-shadow:0 0 0 1px rgba(196,13,30,.4),0 0 22px rgba(196,13,30,.12)}
+.wta-send{align-self:flex-start;margin-top:4px;background:none;border:1px solid var(--bone);color:var(--bone);
+  font-family:var(--meta);font-size:11px;letter-spacing:.34em;text-transform:uppercase;padding:13px 34px;cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s}
+.wta-send:hover{background:var(--blood-live);border-color:var(--blood-live);color:#fff}
+.wta-send.sent{border-color:var(--blade);color:var(--blade)}
+.wta-alt{font-size:10px;letter-spacing:.16em;color:var(--ash);text-transform:uppercase}
+.wta-alt a{color:var(--blade);text-decoration:none}
+.wta-alt a:hover{color:var(--blood-live)}
+.wta-social{display:flex;gap:22px;margin-top:4px}
+.wta-social a{font-size:10px;letter-spacing:.2em;color:var(--blade);text-transform:uppercase;text-decoration:none}
+.wta-social a:hover{color:var(--blood-live)}
+@media(max-width:620px){.wta-row{flex-direction:column}}
+.office-contacts{margin-top:52px;border-top:1px solid rgba(169,174,180,.16);padding-top:44px}
+.oc-row{display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  padding:16px 0;border-bottom:1px solid rgba(169,174,180,.12)}
+.oc-row .k{font-size:12px;letter-spacing:.24em;color:var(--bone);text-transform:uppercase}
+.oc-row a{font-size:12px;letter-spacing:.1em;color:var(--blade);text-decoration:none;transition:color .2s}
+.oc-row a:hover{color:var(--blood-live)}
+.oc-social{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end}
+
+/* ============ responsive ============ */
+@media (max-width:720px){
+  /* cross doesn't fit a phone's width -> stack chambers vertically */
+  .gates{grid-template-columns:1fr;grid-template-rows:none;grid-auto-rows:auto;
+    gap:clamp(30px,5vh,46px);transform:none}
+  .gate.pos-top,.gate.pos-left,.gate.pos-center,.gate.pos-right,.gate.pos-bottom{grid-column:1;grid-row:auto}
+  .sym{width:clamp(74px,20vw,104px);height:clamp(74px,20vw,104px)}
+  .lvne-clock{top:16px;right:16px}
+  .lvne-clock .time{font-size:21px}
+  .oc-row{flex-direction:column;gap:8px}
+  .oc-social{justify-content:flex-start}
+}
+@media (prefers-reduced-motion:reduce){
+  .gate{animation-duration:.001s}
+  .sym{transition:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="void" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" preserveAspectRatio="xMidYMid slice" width="100%" height="100%"><defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="0.62" stop-color="#fff" stop-opacity="0.5"/><stop offset="1" stop-color="#000"/></linearGradient><mask id="m"><rect width="1200" height="1600" fill="url(#fade)"/></mask></defs><g mask="url(#m)"><line x1="896.0" y1="0" x2="896.0" y2="1019.0" stroke="#7a0a14" stroke-width="1" opacity="0.24"/><line x1="985.1" y1="0" x2="985.1" y2="1199.5" stroke="#8f0f1c" stroke-width="1" opacity="0.22"/><line x1="942.1" y1="0" x2="942.1" y2="871.0" stroke="#C40D1E" stroke-width="2" opacity="0.26"/><line x1="997.5" y1="0" x2="997.5" y2="1245.4" stroke="#7a0a14" stroke-width="1" opacity="0.35"/><line x1="926.6" y1="0" x2="926.6" y2="684.7" stroke="#7a0a14" stroke-width="1" opacity="0.29"/><line x1="820.6" y1="0" x2="820.6" y2="1188.1" stroke="#C40D1E" stroke-width="1" opacity="0.28"/><line x1="999.9" y1="0" x2="999.9" y2="997.5" stroke="#7a0a14" stroke-width="1" opacity="0.35"/><line x1="1020.0" y1="0" x2="1020.0" y2="1293.2" stroke="#2f6dd0" stroke-width="2" opacity="0.23"/><line x1="955.6" y1="0" x2="955.6" y2="987.1" stroke="#2f6dd0" stroke-width="1" opacity="0.23"/><line x1="1053.6" y1="0" x2="1053.6" y2="718.6" stroke="#7a0a14" stroke-width="1.5" opacity="0.34"/><line x1="1127.6" y1="0" x2="1127.6" y2="1070.9" stroke="#cfcabf" stroke-width="1" opacity="0.11"/><line x1="935.6" y1="0" x2="935.6" y2="785.9" stroke="#8f0f1c" stroke-width="2" opacity="0.30"/><line x1="1164.0" y1="0" x2="1164.0" y2="1374.0" stroke="#C40D1E" stroke-width="1.5" opacity="0.34"/><line x1="907.1" y1="0" x2="907.1" y2="1196.7" stroke="#2f6dd0" stroke-width="2" opacity="0.14"/><line x1="799.3" y1="0" x2="799.3" y2="1095.1" stroke="#8f0f1c" stroke-width="1" opacity="0.22"/><line x1="1054.6" y1="0" x2="1054.6" y2="1194.8" stroke="#cfcabf" stroke-width="2" opacity="0.13"/><line x1="922.0" y1="0" x2="922.0" y2="973.1" stroke="#cfcabf" stroke-width="2" opacity="0.14"/><line x1="1016.6" y1="0" x2="1016.6" y2="696.6" stroke="#2f6dd0" stroke-width="1.5" opacity="0.15"/><line x1="864.0" y1="0" x2="864.0" y2="1520.1" stroke="#2f6dd0" stroke-width="2" opacity="0.14"/><line x1="948.7" y1="0" x2="948.7" y2="906.7" stroke="#35c46a" stroke-width="1" opacity="0.25"/><line x1="1122.9" y1="0" x2="1122.9" y2="1318.1" stroke="#8f0f1c" stroke-width="1.5" opacity="0.35"/><line x1="919.8" y1="0" x2="919.8" y2="784.9" stroke="#7a0a14" stroke-width="1" opacity="0.26"/><line x1="1036.6" y1="0" x2="1036.6" y2="1105.6" stroke="#C40D1E" stroke-width="1" opacity="0.32"/><line x1="761.7" y1="0" x2="761.7" y2="1153.2" stroke="#2f6dd0" stroke-width="1.5" opacity="0.25"/><line x1="1050.0" y1="0" x2="1050.0" y2="1552.2" stroke="#35c46a" stroke-width="1" opacity="0.20"/><line x1="1125.8" y1="0" x2="1125.8" y2="1406.0" stroke="#cfcabf" stroke-width="2" opacity="0.14"/><line x1="925.5" y1="0" x2="925.5" y2="1248.9" stroke="#2f6dd0" stroke-width="1" opacity="0.15"/><line x1="1173.6" y1="0" x2="1173.6" y2="795.8" stroke="#2f6dd0" stroke-width="1.5" opacity="0.21"/><line x1="803.0" y1="0" x2="803.0" y2="785.2" stroke="#35c46a" stroke-width="1" opacity="0.27"/><line x1="1017.8" y1="0" x2="1017.8" y2="1479.4" stroke="#C40D1E" stroke-width="2" opacity="0.29"/><line x1="865.9" y1="0" x2="865.9" y2="1218.2" stroke="#8f0f1c" stroke-width="2" opacity="0.24"/><line x1="1116.6" y1="0" x2="1116.6" y2="1101.2" stroke="#2f6dd0" stroke-width="1.5" opacity="0.14"/><line x1="802.9" y1="0" x2="802.9" y2="1350.7" stroke="#8f0f1c" stroke-width="2" opacity="0.38"/><line x1="827.8" y1="0" x2="827.8" y2="837.0" stroke="#C40D1E" stroke-width="1.5" opacity="0.29"/><line x1="988.1" y1="0" x2="988.1" y2="1367.8" stroke="#C40D1E" stroke-width="1.5" opacity="0.49"/><line x1="1122.6" y1="0" x2="1122.6" y2="1451.6" stroke="#cfcabf" stroke-width="1.5" opacity="0.19"/><line x1="909.4" y1="0" x2="909.4" y2="1151.3" stroke="#7a0a14" stroke-width="1.5" opacity="0.37"/><line x1="1017.6" y1="0" x2="1017.6" y2="1413.8" stroke="#7a0a14" stroke-width="2" opacity="0.39"/><line x1="855.2" y1="0" x2="855.2" y2="1113.1" stroke="#35c46a" stroke-width="1" opacity="0.28"/><line x1="1091.8" y1="0" x2="1091.8" y2="888.8" stroke="#2f6dd0" stroke-width="1.5" opacity="0.19"/><line x1="1153.5" y1="0" x2="1153.5" y2="1556.8" stroke="#8f0f1c" stroke-width="1.5" opacity="0.23"/><line x1="802.9" y1="0" x2="802.9" y2="828.8" stroke="#2f6dd0" stroke-width="1" opacity="0.19"/><line x1="1173.8" y1="0" x2="1173.8" y2="1446.8" stroke="#35c46a" stroke-width="2" opacity="0.27"/><line x1="904.5" y1="0" x2="904.5" y2="721.4" stroke="#cfcabf" stroke-width="1" opacity="0.19"/><line x1="1088.6" y1="0" x2="1088.6" y2="1098.9" stroke="#7a0a14" stroke-width="1" opacity="0.32"/><line x1="1027.1" y1="0" x2="1027.1" y2="1408.8" stroke="#C40D1E" stroke-width="2" opacity="0.37"/><line x1="208.9" y1="0" x2="208.9" y2="1335.8" stroke="#C40D1E" stroke-width="1" opacity="0.50"/><line x1="94.4" y1="0" x2="94.4" y2="1508.7" stroke="#35c46a" stroke-width="1" opacity="0.23"/><line x1="185.3" y1="0" x2="185.3" y2="1271.0" stroke="#2f6dd0" stroke-width="1.5" opacity="0.15"/><line x1="177.7" y1="0" x2="177.7" y2="653.7" stroke="#C40D1E" stroke-width="1" opacity="0.38"/><line x1="239.4" y1="0" x2="239.4" y2="1587.1" stroke="#2f6dd0" stroke-width="1" opacity="0.24"/><line x1="123.8" y1="0" x2="123.8" y2="844.3" stroke="#8f0f1c" stroke-width="1" opacity="0.37"/><line x1="142.2" y1="0" x2="142.2" y2="1042.3" stroke="#35c46a" stroke-width="1" opacity="0.15"/><line x1="208.4" y1="0" x2="208.4" y2="1276.0" stroke="#2f6dd0" stroke-width="2" opacity="0.24"/><line x1="230.5" y1="0" x2="230.5" y2="1150.6" stroke="#7a0a14" stroke-width="1" opacity="0.42"/><line x1="214.2" y1="0" x2="214.2" y2="643.8" stroke="#35c46a" stroke-width="1" opacity="0.16"/><line x1="165.8" y1="0" x2="165.8" y2="755.5" stroke="#cfcabf" stroke-width="1" opacity="0.13"/><line x1="172.9" y1="0" x2="172.9" y2="1103.2" stroke="#35c46a" stroke-width="1" opacity="0.26"/><line x1="99.1" y1="0" x2="99.1" y2="905.8" stroke="#7a0a14" stroke-width="1" opacity="0.34"/><line x1="179.9" y1="0" x2="179.9" y2="1065.5" stroke="#C40D1E" stroke-width="1" opacity="0.42"/></g><path d="M0,760 C300,700 520,1080 640,1180 C820,1330 980,1300 1200,1360" fill="none" stroke="#9aa0a8" stroke-width="1.2" opacity="0.16"/><path d="M640,1180 C700,1120 760,1160 900,1080" fill="none" stroke="#9aa0a8" stroke-width="0.8" opacity="0.12"/><path d="M520,1000 C560,1040 520,1120 470,1160" fill="none" stroke="#9aa0a8" stroke-width="0.7" opacity="0.10"/></svg></div>
+
+  <!-- LANDING -->
+  <section id="landing" class="view is-active" aria-label="Enter LOSSSTSIGNAL" role="button" tabindex="0">
+    <div id="crossHost" aria-hidden="true"></div>
+  </section>
+
+  <!-- HUB -->
+  <section id="hub" class="view" aria-label="Gateway">
+    <button class="anchor" data-go="landing" aria-label="Return to signal">✠</button>
+    <div class="gates">
+      <button class="gate pos-top" data-key="lvne" aria-label="LVNE">
+        <span class="sym"><img src="disc.gif" alt=""></span>
+        <span class="label">LVNE</span>
+      </button>
+      <button class="gate pos-left" data-key="maison" aria-label="MAISON">
+        <span class="sym mm-mark"><img src="maison.png" alt=""></span>
+        <span class="label">Maison</span>
+      </button>
+      <button class="gate pos-right" data-key="underbelly" aria-label="The Underbelly">
+        <span class="sym"><img src="penta.gif" alt=""></span>
+        <span class="label">The Underbelly</span>
+      </button>
+      <button class="gate pos-bottom" data-key="office" aria-label="The Office">
+        <span class="sym"><img src="folder.gif" alt=""></span>
+        <span class="label">The Office</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- LVNE — artist page + record view (record served at /<slug>, see TRANSMISSIONS) -->
+  <section id="lvne" class="view" aria-label="LVNE — EMORI">
+    <button class="anchor" id="lvneBack" aria-label="Back">✠</button>
+
+    <!-- ===== ARTIST PAGE ===== -->
+    <div id="artist" class="lvne-screen is-active">
+      <div class="hero">
+        <video id="heroVid" playsinline loop muted autoplay preload="metadata"></video>
+        <div class="hero-scrim"></div>
+        <div class="hero-id"><div class="hero-name">EMORI</div></div>
+      </div>
+      <div class="catalogue">
+        <div class="sec-label">Latest Release</div>
+        <button class="latest" id="latestBtn" data-slug="">
+          <img class="lat-cover" id="latCover" alt="">
+          <div class="lat-info">
+            <div class="lat-title" id="latTitle"></div>
+            <div class="lat-sub" id="featStatus"></div>
+            <span class="lat-enter">&#9654; Enter Record</span>
+          </div>
+        </button>
+        <div class="sec-label sec-tx">Transmissions</div>
+        <div class="tx-list" id="txList"></div>
+      </div>
+    </div>
+
+    <!-- ===== RECORD VIEW (active transmission) ===== -->
+    <div id="record" class="lvne-screen">
+      <div class="stage" id="stage" aria-hidden="true"><video id="stageVid" playsinline loop muted preload="metadata"></video></div>
+      <audio id="uAudio" preload="auto" loop controlslist="nodownload noremoteplayback" disableremoteplayback></audio>
+
+      <div class="lvne-clock" id="uClock">
+        <div class="time" id="uTime">--:--:--:--</div>
+        <div class="udate" id="uDate"></div>
+      </div>
+
+      <div class="mini" id="mini">
+        <img class="art" id="miniArt" alt="">
+        <div class="txt">
+          <div class="name" id="miniName"></div>
+          <div class="sub" id="miniSub"></div>
+        </div>
+        <div class="ctrls">
+          <button id="miniPlay" aria-label="Play"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+          <button id="miniNext" aria-label="Restart"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+        </div>
+        <div class="prog" id="miniProg"></div>
+      </div>
+
+      <button class="tab" id="uTab">Credits</button>
+      <aside class="panel" id="uPanel" aria-hidden="true">
+        <button class="close" id="uClose" aria-label="Close">&#10005; CLOSE</button>
+        <div>
+          <div class="p-label">Artwork</div>
+          <div class="p-art"><img class="p-cover" id="pCover" alt=""></div>
+          <p class="p-syn" id="pSyn"></p>
+        </div>
+        <div>
+          <div class="p-label">Lyrics</div>
+          <div id="pLyrics"></div>
+        </div>
+        <div class="p-credits" id="pCredits"></div>
+      </aside>
+    </div>
+  </section>
+  <!-- THE OFFICE — write to the artist -->
+  <section id="office" class="view" aria-label="The Office">
+    <button class="anchor" data-go="hub" aria-label="Return to gateway">✠</button>
+    <div class="office-wrap">
+      <div class="wta-head">
+        <div class="wta-sub">For licensing, bookings, and correspondences of weight.</div>
+      </div>
+      <div class="wta-form">
+        <div class="wta-row">
+          <label class="wta-field"><span>Name</span><input id="wtaName" type="text" placeholder="YOUR NAME" autocomplete="name"></label>
+          <label class="wta-field"><span>Email</span><input id="wtaEmail" type="email" placeholder="YOUR@EMAIL.COM" autocomplete="email"></label>
+        </div>
+        <label class="wta-field"><span>Subject</span><input id="wtaSubject" type="text" placeholder="WHAT BRINGS YOU HERE"></label>
+        <label class="wta-field"><span>Message</span><textarea id="wtaMessage" rows="6" placeholder="SPEAK FREELY."></textarea></label>
+        <button class="wta-send" id="wtaSend">Send</button>
+        <div class="wta-alt">or write directly — <a href="mailto:lordemori@icloud.com">lordemori@icloud.com</a></div>
+        <div class="wta-social">
+          <a href="https://instagram.com/darklordmori" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://kick.com/lossstsignal" target="_blank" rel="noopener">Kick</a>
+          <a href="https://x.com/darklordemori" target="_blank" rel="noopener">X</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="saClock" aria-hidden="true">—</div>
+  <div id="hubCredit" aria-hidden="true">© EMORI Inc</div>
+
+  <!-- DECLARATION — opened by © EMORI INC (hidden) -->
+  <div id="declaration" class="decl-overlay" aria-hidden="true">
+    <button class="decl-close" id="declClose" aria-label="Close">✕</button>
+    <div class="office-wrap">
+      <div class="decl-mark">✠</div>
+      <div class="decl">
+        <p>I am a being of consciousness, and I have made a commitment to creation.</p>
+        <p>Not merely to make. To construct.</p>
+        <p>Ideas. Narratives. Systems. Images. Spaces. Garments. Objects. Film. Audio. Worlds.</p>
+        <p>I refuse the limitation of a single medium because I have never believed that thought should be confined to one.</p>
+        <p>I will not choose between disciplines. I will not choose between form and function. I will not choose between the beautiful and the impossible.</p>
+        <p>I intend to have them all.</p>
+        <p>I will take what exists only in thought and force it into existence. I will give shape to abstraction. I will give atmosphere to ideas. I will give language to the things that have yet to be named.</p>
+        <p>Where others see an image, I see a world. Where others see a garment, I see identity. Where others hear audio, I hear architecture. Where others encounter an object, I see mythology made physical. Where others build a product, I will build an experience.</p>
+        <p>And at the center of everything I create stands my most uncompromising devotion:</p>
+        <div class="big">Aesthetic Design.</div>
+        <p>I do not regard aesthetics as decoration. I regard it as power. It is the first language of the world.</p>
+        <p>Before something is understood, it is seen. Before it is touched, it is perceived. Before it is remembered, it leaves an impression.</p>
+        <p>Therefore I will not treat aesthetics as an afterthought.</p>
+        <div class="big">Aesthetics will govern the work.</div>
+        <p>Every image. Every surface. Every silhouette. Every space. Every sound. Every object. Every word. Every detail.</p>
+        <p>Nothing is permitted to exist without intention.</p>
+        <p>I will obsess over the beautiful until the beautiful becomes unmistakable. I will pursue coherence until every element belongs to the same universe. I will refine until excess becomes elegance and simplicity becomes power.</p>
+        <p>I will build with such conviction that the distinction between art, design, fashion, music, architecture, cinema, and technology becomes irrelevant.</p>
+        <p>Because I am not interested in participating in categories created by other people.</p>
+        <div class="big red">I am interested in creating the category.</div>
+        <p>I will construct ideas so complete they become realities. Narratives so immersive they become memories. Systems so deliberate they become worlds. And worlds so singular that they could only have come from me.</p>
+        <div class="big">I am not here to decorate the world. I am here to alter its aesthetic vocabulary.</div>
+        <div class="big">I am not here to follow taste. I am here to impose it.</div>
+        <p>I am not here to ask whether something can be done. I am here to decide what should exist.</p>
+        <p>This is not a hobby. It is not a phase. It is not a brand exercise.</p>
+        <p>It is my practice. My obsession. My discipline. My declaration.</p>
+        <div class="big red">I will construct. I will design. I will create.</div>
+        <p>And everything that bears the mark of ✠ will carry the evidence of that commitment.</p>
+        <div class="sign">✠</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCESS DENIED -->
+  <div id="denied" role="dialog" aria-modal="true">
+    <div class="denied-box">
+      <h2>Access Denied</h2>
+      <p id="deniedMsg"></p>
+      <div class="dismiss">TAP ANYWHERE TO DISMISS</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ================= TRANSMISSIONS — one entry per release =================
+   The transmission TEMPLATE belongs to LVNE. Everything release-specific lives here:
+   route (slug), visual, audio, artwork, credits, lyrics, release moment.
+   releaseISO:null  -> live immediately. A date -> locked + countdown until then.
+   listed:false     -> kept ready, not shown in the log, no route.
+   To give a release its own route later: set listed:true and delete its ROUTE_ALIASES line. */
+const TRANSMISSIONS = {
+  tellme: {
+    slug: 'tellme', listed: true, number: '001', title: 'TELL MË',
+    visual: { webm: 'tellme.webm', mp4: 'tellme.mp4', poster: 'tellme-poster.jpg' },
+    audio: 'tellme.m4a',
+    art: 'tellme-cover.jpg',
+    releaseISO: null,
+    synopsis: '',
+    credits: [['Performer','✠'],['Writer','✠'],['Producer','✠']],
+    published: '℗ 2026 LVNE',
+    lyrics: `VERSE:
+mami u got my attention
+i want u right by my side
+
+pretty brown ebony skin
+mami u just my type
+
+u got me hot im on ten
+an u know just what i want
+
+the way u be starin at me
+mami im lost in ur charm
+
+an u 1 of 1 baby
+
+everyone watchin
+these bitches just mad jealous
+
+they seein u high in demand
+the one they cant touch
+
+u out here runnin a tab
+got these bitches stuck in the mud
+
+
+CHORUS:
+need me a bitch
+with an attitude
+
+yea she bad
+she get what she want
+when she want it too
+
+that my twin
+i would never
+be the one to play with u
+
+tell me baby
+if this is something
+u tryna get into`
+  },
+  u: {   // dormant — flip listed:true + drop the alias below, and re-add these files, to bring U back on /u
+    slug: 'u', listed: false, number: '000', title: 'U',
+    visual: { webm: 'u.webm', mp4: 'u.mp4', poster: 'u-poster.jpg' },
+    audio: 'u.mp3',
+    art: 'u-cover.jpg',
+    releaseISO: '2026-10-09T20:00:00+02:00',
+    synopsis: "U is about me trying to numb myself from love, only to find someone who makes that impossible. What starts as attraction becomes something deeper, revealing how much I've been missing. Despite everything I do to hide it, all I see is her.",
+    credits: [['Performer','✠'],['Writer','✠'],['Producer','✠']],
+    published: '℗ 2026 LVNE',
+    lyrics: ''
+  }
+};
+const ACTIVE = 'tellme';                 // the featured transmission (Latest Release + hero)
+const ROUTE_ALIASES = { u: 'tellme' };   // old URL -> current slug (client-side redirect)
+const CROSS_FALLBACK = "cross.gif";
+
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const views = {
+  landing:document.getElementById('landing'),
+  hub:document.getElementById('hub'),
+  lvne:document.getElementById('lvne'),
+  office:document.getElementById('office')
+};
+const saClock=document.getElementById('saClock');
+const hubCredit=document.getElementById('hubCredit');
+let current='landing';
+function show(name, push){
+  if(current==='lvne' && name!=='lvne') leaveLVNE();
+  views[current].classList.remove('is-active');
+  views[name].classList.add('is-active');
+  current=name;
+  saClock.style.display = (name==='landing'||name==='lvne') ? 'none' : 'block';
+  hubCredit.style.display = (name==='hub') ? 'block' : 'none';
+  if(name==='lvne') enterLVNE();
+  if(name==='landing') host.style.setProperty('--g',0.15);
+  if(push!==false && name!=='lvne'){ try{ if(location.pathname!=='/') history.pushState({v:name},'','/'); }catch(e){} }
+}
+
+/* ================= LANDING — pixel 3D cross ================= */
+const host=document.getElementById('crossHost');
+const landing=document.getElementById('landing');
+let crossSpeed=0.006, crossTarget=0.006, crossMesh=null;
+
+function initCross(){
+  if(!window.THREE){ fallbackCross(); return; }
+  try{
+    const R=200;
+    const scene=new THREE.Scene();
+    const cam=new THREE.PerspectiveCamera(42,1,0.1,100); cam.position.z=4.4;
+    const rnd=new THREE.WebGLRenderer({antialias:false,alpha:true});
+    rnd.setPixelRatio(1); rnd.setSize(R,R,false);
+    host.appendChild(rnd.domElement);
+
+    // ---- voxel cross, baked from the cross master's alpha ----
+    const GRID=("00000111111111111111111111111111111111100000\n00000111111111111111111111111111111111100000\n00000001111111111111111111111111111110000000\n00000000000111111111111111111111100000000000\n00000000000001111111111111111110000000000000\n11000000000000111111111111111100000000000011\n11000000000000011111111111111000000000000011\n11100000000000001111111111110000000000000011\n11100000000000000111111111100000000000000011\n11100000000000000011111111000000000000000111\n11100000000000000011111111000000000000000111\n11110000000000000001111110000000000000001111\n11110000000000000001111110000000000000001111\n11111000000000000001111110000000000000011111\n11111100000000000001111110000000000000111111\n11111110000000000000111110000000000001111111\n11111111000000000000111100000000000011111111\n11111111100000000000111100000000000111111111\n11111111111000000001111110000000011111111111\n11111111111111110011111111001111111111111111\n11111111111111111111111111111111111111111111\n11111111111111111111111111111111111111111111\n11111111111111111111111111111111111111111111\n11111111111111111111111111111111111111111111\n11111111111111110011111111000111111111111111\n11111111111000000001111110000000011111111111\n11111111100000000000111100000000000111111111\n11111111000000000000111100000000000011111111\n11111110000000000000111110000000000001111111\n11111100000000000001111110000000000000111111\n11111000000000000001111110000000000000011111\n11110000000000000001111110000000000000001111\n11110000000000000001111110000000000000001111\n11100000000000000011111111000000000000000111\n11100000000000000011111111000000000000000111\n11100000000000000111111111100000000000000111\n11100000000000001111111111110000000000000111\n11000000000000011111111111111000000000000011\n11000000000000111111111111111100000000000011\n00000000000001111111111111111110000000000000\n00000000000111111111111111111111100000000000\n00000001111111111111111111111111111110000000\n00000111111111111111111111111111111111100000\n00000111111111111111111111111111111111100000").split("\n");
+    const N=GRID.length, DEPTH=6;
+    const cube=new THREE.BoxGeometry(1,1,DEPTH);
+    const mat=new THREE.MeshStandardMaterial({color:0xE8E4DA,metalness:0.14,roughness:0.55});
+    let count=0; for(const row of GRID) for(const ch of row) if(ch==="1") count++;
+    const inst=new THREE.InstancedMesh(cube,mat,count);
+    const mtx=new THREE.Matrix4(); let idx=0;
+    for(let y=0;y<N;y++){ const row=GRID[y];
+      for(let x=0;x<row.length;x++){ if(row[x]==="1"){
+        mtx.makeTranslation(x-row.length/2+0.5,(N/2-y)-0.5,0);
+        inst.setMatrixAt(idx++,mtx);
+      }}}
+    inst.instanceMatrix.needsUpdate=true;
+    const scl=2.5/N; inst.scale.set(scl,scl,scl);
+    crossMesh=inst; scene.add(crossMesh);
+    scene.add(new THREE.AmbientLight(0xffffff,0.55));
+    const key=new THREE.DirectionalLight(0xffffff,0.95); key.position.set(2,3,4); scene.add(key);
+    const rim=new THREE.DirectionalLight(0xC40D1E,0.85); rim.position.set(-3,-1,-2.5); scene.add(rim);
+
+    (function loop(){
+      crossSpeed += (crossTarget-crossSpeed)*0.05;
+      crossMesh.rotation.x += crossSpeed;
+      crossMesh.rotation.y += crossSpeed*1.42;
+      rnd.render(scene,cam);
+      requestAnimationFrame(loop);
+    })();
+  }catch(e){ fallbackCross(); }
+}
+function fallbackCross(){
+  const img=document.createElement('img'); img.src=CROSS_FALLBACK; img.alt='✠';
+  host.appendChild(img);
+}
+initCross();
+
+// proximity → speed + red glow
+landing.addEventListener('mousemove', e=>{
+  if(current!=='landing') return;
+  const r=host.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  const d=Math.hypot(e.clientX-cx,e.clientY-cy);
+  const max=Math.min(innerWidth,innerHeight)*0.5;
+  const p=Math.max(0,Math.min(1,1-d/max));
+  crossTarget=reduce?0.006:(0.006+p*0.05);
+  host.style.setProperty('--g',(0.12+p*0.7).toFixed(3));
+});
+landing.addEventListener('mouseleave',()=>{crossTarget=0.006;host.style.setProperty('--g',0.15)});
+landing.addEventListener('click',()=>show('hub'));
+landing.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show('hub')}});
+// touch presence
+landing.addEventListener('touchstart',()=>{crossTarget=reduce?0.006:0.05;host.style.setProperty('--g',0.7)},{passive:true});
+
+/* ================= HUB ================= */
+const DENIED={
+  maison:"Closed to the public. Nothing here is for sale yet.",
+  underbelly:"You are not cleared for what lies below."
+};
+const gates=[...document.querySelectorAll('.gate')];
+gates.forEach(g=>{
+  g.addEventListener('click',()=>{
+    const k=g.dataset.key;
+    if(k==='lvne'){ show('lvne'); showLvneScreen('artist'); }
+    else if(k==='office') show('office');
+    else openDenied(DENIED[k]);
+  });
+});
+// per-icon proximity envelope (desktop)
+const hub=document.getElementById('hub');
+const discSym=gates[0].querySelector('.sym');
+let discRot=0;
+hub.addEventListener('mousemove',e=>{
+  if(current!=='hub'||reduce) return;
+  gates.forEach(g=>{
+    const sym=g.querySelector('.sym');
+    const r=sym.getBoundingClientRect();
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    const d=Math.hypot(e.clientX-cx,e.clientY-cy);
+    const p=Math.max(0,Math.min(1,1-d/280));
+    sym.style.setProperty('--p',p.toFixed(3));
+  });
+});
+hub.addEventListener('mouseleave',()=>gates.forEach(g=>g.querySelector('.sym').style.setProperty('--p',0)));
+// disc accelerates its own spin under the cursor
+(function spin(){
+  const p=parseFloat(getComputedStyle(discSym).getPropertyValue('--p'))||0;
+  discRot=(discRot+0.15+p*2.6)%360;
+  discSym.querySelector('img').style.transform='rotate('+discRot+'deg)';
+  requestAnimationFrame(spin);
+})();
+
+/* ================= ACCESS DENIED ================= */
+const denied=document.getElementById('denied');
+function openDenied(msg){document.getElementById('deniedMsg').textContent=msg;denied.classList.add('show')}
+denied.addEventListener('click',()=>denied.classList.remove('show'));
+
+/* ================= persistent ✠ anchors + Esc ================= */
+document.querySelectorAll('.anchor:not(#lvneBack)').forEach(a=>a.addEventListener('click',()=>show(a.dataset.go)));
+document.getElementById('lvneBack').addEventListener('click',()=>{ if(lvneScreen==='record') showLvneScreen('artist'); else show('hub'); });
+addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(declaration.classList.contains('show')){declaration.classList.remove('show');return}
+  if(denied.classList.contains('show')){denied.classList.remove('show');return}
+  if(current==='lvne'&&uPanel.classList.contains('open')){uPanel.classList.remove('open');lvneEl.classList.remove('panel-open');return}
+  if(current==='lvne'&&lvneScreen==='record'){showLvneScreen('artist');return}
+  if(current==='lvne'||current==='office')show('hub');
+  else if(current==='hub')show('landing');
+});
+
+/* ================= LVNE — artist page + record view ================= */
+const lvneEl=document.getElementById('lvne');
+const lvneArtist=document.getElementById('artist'), lvneRecord=document.getElementById('record');
+let lvneScreen='artist';
+const $=id=>document.getElementById(id);
+const uAudio=$('uAudio'), heroVid=$('heroVid'), stageVid=$('stageVid');
+const mini=$('mini');
+const uTab=$('uTab'), uPanel=$('uPanel');
+let cur=null, target=0, released=false, audioReady=false, playing=false, dateStr='';
+const tgtOf=t=>t.releaseISO?new Date(t.releaseISO).getTime():0;
+const hasOwn=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+
+/* ---- visuals ---- */
+function playVid(v){ if(!v) return; const p=v.play(); if(p&&p.catch) p.catch(()=>{}); }
+function setVisual(v, vis, focus){
+  if(!v||!vis) return;
+  v.style.objectPosition=focus||'';
+  if(v.dataset.src===vis.mp4) return;
+  v.dataset.src=vis.mp4; v.poster=vis.poster||''; v.innerHTML='';
+  [['webm','video/webm'],['mp4','video/mp4']].forEach(([k,type])=>{
+    if(vis[k]){ const so=document.createElement('source'); so.src=vis[k]; so.type=type; v.appendChild(so); }
+  });
+  v.load();
+}
+
+/* ---- artist page (Latest Release + Transmissions log) driven by TRANSMISSIONS ---- */
+function renderArtist(){
+  const t=TRANSMISSIONS[ACTIVE];
+  $('latCover').src=t.art; $('latCover').alt=t.title;
+  $('latTitle').textContent=t.title; $('latestBtn').dataset.slug=t.slug;
+  const list=$('txList'); list.innerHTML='';
+  Object.keys(TRANSMISSIONS).map(k=>TRANSMISSIONS[k]).filter(x=>x.listed).forEach(x=>{
+    const bt=document.createElement('button'); bt.className='tx-row'; bt.dataset.slug=x.slug;
+    bt.innerHTML='<span class="tx-num"></span><img class="tx-thumb" alt=""><span class="tx-title"></span><span class="tx-arrow">Enter &#8250;</span>';
+    bt.querySelector('.tx-num').textContent=x.number;
+    bt.querySelector('.tx-thumb').src=x.art;
+    bt.querySelector('.tx-title').textContent=x.title;
+    list.appendChild(bt);
+  });
+  setVisual(heroVid,t.visual,t.visualFocus);
+}
+lvneArtist.addEventListener('click',e=>{
+  const bt=e.target.closest&&e.target.closest('[data-slug]');
+  if(bt&&bt.dataset.slug) openTransmission(bt.dataset.slug);
+});
+
+/* ---- record view: load a release into the (single, reused) transmission component ---- */
+function renderCredits(t){
+  const c=$('pCredits'); c.innerHTML='<div class="p-label">Credits</div>';
+  const add=(k,v,gap)=>{
+    const ke=document.createElement('div'); ke.className='k'; ke.textContent=k; if(gap) ke.style.marginTop='14px';
+    const ve=document.createElement('div'); ve.className='v'; ve.textContent=v;
+    c.appendChild(ke); c.appendChild(ve);
+  };
+  (t.credits||[]).forEach(p=>add(p[0],p[1]));
+  if(t.published) add('Published',t.published,true);
+}
+function loadTransmission(slug){
+  if(!hasOwn(TRANSMISSIONS,slug)) return false;
+  const t=TRANSMISSIONS[slug];
+  if(cur!==t){
+    cur=t; target=tgtOf(t); audioReady=false;
+    try{ uAudio.pause(); uAudio.removeAttribute('src'); uAudio.load(); }catch(e){}
+    $('miniArt').src=t.art;
+    $('pCover').src=t.art; $('pCover').alt=t.title+' artwork';
+    $('pSyn').textContent=t.synopsis||'';
+    renderCredits(t);
+    const dp=(t.releaseISO||'').slice(0,10).split('-');
+    dateStr=t.releaseISO?(dp[2]+'/'+dp[1]+'/'+dp[0].slice(-2)):'';
+    applyReleaseState();
+  }
+  return true;
+}
+function openTransmission(slug,push){
+  if(!loadTransmission(slug)) return;
+  setVisual(stageVid,cur.visual,cur.visualFocus);
+  showLvneScreen('record',push);
+}
+
+function enterLVNE(){ applyReleaseState(); if(lvneScreen==='artist') playVid(heroVid); }
+function leaveLVNE(){
+  try{uAudio.pause()}catch(e){}
+  try{stageVid.pause();heroVid.pause()}catch(e){}
+  setPlay(false);
+  uPanel.classList.remove('open');
+  lvneEl.classList.remove('panel-open');
+}
+function showLvneScreen(name, push){
+  lvneArtist.classList.toggle('is-active', name==='artist');
+  lvneRecord.classList.toggle('is-active', name==='record');
+  lvneScreen=name;
+  if(name==='artist'){
+    uPanel.classList.remove('open'); lvneEl.classList.remove('panel-open');
+    try{uAudio.pause()}catch(e){}   // playback doesn't persist across screens — leaving a transmission stops it
+    try{stageVid.pause()}catch(e){}
+    playVid(heroVid);
+  } else {
+    try{heroVid.pause()}catch(e){}
+    playVid(stageVid);
+    startPlayback();                // plays on entry, sound on (the entry tap is the gesture)
+  }
+  if(push!==false){ const t = (name==='record'&&cur) ? '/'+cur.slug : '/'; try{ if(location.pathname!==t) history.pushState({v:'lvne',s:name},'',t); }catch(e){} }
+}
+function applyReleaseState(){
+  if(!cur) return;
+  const live = Date.now() >= target;
+  released = live;
+  lvneEl.classList.toggle('locked', !live);
+  $('miniName').textContent = live ? cur.title : cur.title+' — LOCKED';
+  $('miniSub').textContent  = live ? '✠' : 'Transmission Incoming';
+  if(live){
+    if(!audioReady && cur.audio){ uAudio.src=cur.audio; audioReady=true; setupMediaSession(); }
+  }
+  renderLyrics();
+}
+
+/* ---- playback: separate <audio> (keeps playing when the phone locks / app switches), looped ---- */
+let armed=false;
+function startPlayback(){
+  if(!released||!cur||!audioReady) return;
+  const p=uAudio.play();
+  if(p&&p.catch) p.catch(armGesturePlay);
+}
+// deep-link / refresh: browsers block sound without a gesture -> start on the first tap/key
+function armGesturePlay(){
+  if(armed) return; armed=true;
+  const evs=['pointerdown','keydown','touchend'];
+  const go=e=>{
+    armed=false; evs.forEach(ev=>removeEventListener(ev,go,true));
+    if(e&&e.target&&e.target.closest&&e.target.closest('.mini')) return;   // let the transport button decide
+    if(current==='lvne'&&lvneScreen==='record'&&uAudio.paused) startPlayback();
+  };
+  evs.forEach(ev=>addEventListener(ev,go,true));
+}
+function setupMediaSession(){
+  if(!('mediaSession' in navigator)||!cur) return;
+  try{
+    navigator.mediaSession.metadata=new MediaMetadata({title:cur.title,artist:'LVNE',album:cur.title,
+      artwork:[{src:new URL(cur.art,document.baseURI).href,sizes:'900x900',type:'image/jpeg'}]});
+    navigator.mediaSession.setActionHandler('play',()=>{ uAudio.play().catch(()=>{}); });
+    navigator.mediaSession.setActionHandler('pause',()=>{ uAudio.pause(); });
+  }catch(e){}
+}
+// the picture follows the audio clock so both loop together
+function syncStage(force,tol){
+  if(!stageVid||uAudio.paused||!isFinite(uAudio.duration)||!isFinite(stageVid.duration)||!stageVid.duration) return;
+  const L=stageVid.duration;
+  let d=uAudio.currentTime-stageVid.currentTime;
+  if(d>L/2) d-=L; if(d<-L/2) d+=L;
+  if(force||Math.abs(d)>(tol||0.25)){ try{ stageVid.currentTime=uAudio.currentTime%L; }catch(e){} }
+}
+let lastAT=0;   // audio wrapped (loop) -> realign the picture tightly so loop-length differences never accumulate
+function setPlay(on){
+  playing=on;
+  const d = on ? 'M6 5h4v14H6zM14 5h4v14h-4z' : 'M8 5v14l11-7z';
+  $('miniPlay').querySelector('path').setAttribute('d',d);
+}
+function playPause(){ if(!released) return; if(uAudio.paused){ uAudio.play().catch(()=>{}); } else { uAudio.pause(); } }
+function restart(){ if(released){ uAudio.currentTime=0; syncStage(true); } }
+$('miniPlay').onclick=(e)=>{e.stopPropagation();playPause();};
+$('miniNext').onclick=(e)=>{e.stopPropagation();restart();};
+uAudio.addEventListener('play',()=>{ setPlay(true); playVid(stageVid); syncStage(true); try{navigator.mediaSession.playbackState='playing'}catch(e){} });
+uAudio.addEventListener('pause',()=>{ setPlay(false); try{navigator.mediaSession.playbackState='paused'}catch(e){} });
+uAudio.addEventListener('timeupdate',()=>{
+  if(uAudio.duration){ $('miniProg').style.width=(uAudio.currentTime/uAudio.duration*100)+'%'; }
+  const wrapped=uAudio.currentTime<lastAT-1; lastAT=uAudio.currentTime;
+  syncStage(false, wrapped?0.04:0.25);
+});
+uAudio.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&current==='lvne'&&lvneScreen==='record'){ playVid(stageVid); syncStage(true); }
+});
+
+/* CREDITS tab + panel */
+uTab.addEventListener('click',()=>{ renderLyrics(); uPanel.classList.add('open'); lvneEl.classList.add('panel-open'); });
+$('uClose').addEventListener('click',()=>{ uPanel.classList.remove('open'); lvneEl.classList.remove('panel-open'); });
+function renderLyrics(){
+  const el=$('pLyrics'); if(!el||!cur) return;
+  if(released && cur.lyrics){ const p=document.createElement('p'); p.textContent=cur.lyrics; el.innerHTML=''; el.appendChild(p); }
+  else if(released){ el.innerHTML='<div class="locked">Lyrics — coming with the record</div>'; }
+  else { el.innerHTML='<div class="locked"></div>'; el.firstChild.textContent='Lyrics / Locked · releases with '+cur.title; }
+}
+
+/* countdown (only for a release with a future releaseISO) + hidden date reveal + "days remaining" on the artist page */
+const uClock=$('uClock'), uTime=$('uTime'), uDate=$('uDate');
+const featStatus=$('featStatus');
+let dateTimer=null;
+uClock.addEventListener('click',()=>{
+  if(released||!dateStr) return;
+  uDate.textContent=dateStr; uDate.classList.add('show');
+  clearTimeout(dateTimer); dateTimer=setTimeout(()=>uDate.classList.remove('show'),5000);
+});
+function tickU(){
+  const featTarget=tgtOf(TRANSMISSIONS[ACTIVE]);
+  if(featStatus){
+    const fd=featTarget-Date.now();
+    featStatus.textContent = fd<=0 ? 'Available now' : 'Releases in '+Math.floor(fd/864e5)+' days';
+  }
+  if(!cur) return;
+  let diff=target-Date.now();
+  if(diff<=0){
+    if(!released) applyReleaseState();
+    uTime.textContent='00:00:00:00';
+    return;
+  }
+  const p=n=>String(n).padStart(2,'0');
+  const d=Math.floor(diff/864e5); diff-=d*864e5;
+  const h2=Math.floor(diff/36e5); diff-=h2*36e5;
+  const m=Math.floor(diff/6e4); diff-=m*6e4;
+  const sec=Math.floor(diff/1e3);
+  uTime.textContent=p(d)+':'+p(h2)+':'+p(m)+':'+p(sec);
+}
+renderArtist(); loadTransmission(ACTIVE);
+tickU(); setInterval(tickU,1000);
+
+/* South Africa (Johannesburg) time — top-left, all views except landing */
+const wtaSend=document.getElementById('wtaSend');
+if(wtaSend){ wtaSend.addEventListener('click',()=>{
+  const n=document.getElementById('wtaName').value.trim();
+  const e=document.getElementById('wtaEmail').value.trim();
+  const s=document.getElementById('wtaSubject').value.trim();
+  const m=document.getElementById('wtaMessage').value.trim();
+  const subject=encodeURIComponent(s||'Transmission — LOSSSTSIGNAL');
+  const body=encodeURIComponent((n?('From: '+n):'')+(e?(' <'+e+'>'):'')+'\n\n'+m);
+  window.location.href='mailto:lordemori@icloud.com?subject='+subject+'&body='+body;
+  wtaSend.textContent='Opening mail…'; wtaSend.classList.add('sent');
+  setTimeout(()=>{wtaSend.textContent='Send';wtaSend.classList.remove('sent');},2500);
+});}
+
+setInterval(()=>{ try{ const t=new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Johannesburg',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date()); saClock.textContent=t; }catch(e){} },1000);
+
+/* ================= Declaration (© EMORI INC easter egg) ================= */
+const declaration=document.getElementById('declaration');
+hubCredit.addEventListener('click',()=>declaration.classList.add('show'));
+document.getElementById('declClose').addEventListener('click',()=>declaration.classList.remove('show'));
+declaration.addEventListener('click',e=>{ if(e.target===declaration) declaration.classList.remove('show'); });
+
+/* ================= routing — /<slug> per transmission; retired slugs alias forward (/u -> /tellme) ================= */
+function routeFromPath(){
+  try{
+    let p=location.pathname.replace(/^\/+|\/+$/g,'').toLowerCase();
+    if(hasOwn(ROUTE_ALIASES,p)){
+      p=ROUTE_ALIASES[p];
+      try{ history.replaceState({v:'lvne',s:'record'},'','/'+p); }catch(e){}
+    }
+    return (hasOwn(TRANSMISSIONS,p)&&TRANSMISSIONS[p].listed) ? p : null;
+  }catch(e){ return null; }
+}
+addEventListener('popstate',()=>{
+  const r=routeFromPath();
+  if(r){ if(current!=='lvne') show('lvne', false); openTransmission(r, false); }
+  else if(current==='lvne'){ if(lvneScreen==='record') showLvneScreen('artist', false); else show('hub', false); }
+});
+(function boot(){
+  const r=routeFromPath();
+  if(r){ landing.classList.remove('is-active'); show('lvne', false); openTransmission(r, false); }
+})();
+
+</script>
+</body>
+</html>
